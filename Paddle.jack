@@ -1,0 +1,89 @@
+/** Implements the paddle to be moved by the player. */
+class Paddle {
+
+   field int x, y; // screen location of the paddle's top-left corner
+   field int length; // length of this paddle, in pixels
+   field int width; // width of this paddle, in pixels
+   field int speed;
+
+   /** Constructs a new paddle with a given location and size. */
+   constructor Paddle new(int Ax, int Ay, int Alength, int Awidth, int Aspeed) {
+      let x = Ax;
+      let y = Ay;
+      let length = Alength;
+      let width = Awidth;
+      let speed = Aspeed;
+      do draw();
+      return this;
+   }
+
+   method int get_x () {
+     return x;
+   }
+
+   method int get_y () {
+     return y;
+   }
+
+   method int get_length () {
+     return length;
+   }
+
+   method int get_width () {
+     return width;
+   }
+
+   /** Disposes this paddle. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Draws the paddle on the screen. */
+   method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      return;
+   }
+
+   /** Erases the paddle from the screen. */
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      return;
+   }
+
+   /** Moves the paddle left by 2 pixels. */
+   method void moveLeft() {
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      if ((x-speed) > 1) {
+         // Whole paddle can move
+         let x = x - speed;
+      }
+      else {
+         // Put paddle in corner
+         let x = 1;
+      }
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      return;
+   }
+
+   /** Moves the paddle right by 2 pixels. */
+   method void moveRight() {
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      if ((x + length + speed) < 510) {
+        // Whole paddle can move
+         let x = x + speed;
+      }
+      else {
+        // Put paddle in corner
+         let x = (510 - length);
+      }
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + length, y + width);
+      return;
+   }
+}

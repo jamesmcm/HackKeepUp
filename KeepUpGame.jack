@@ -1,0 +1,224 @@
+/**
+ * Implements the KeepUp game.
+ * The aim of the game is to keep the ball bouncing by moving the paddle below it.
+ * The paddle is controlled by the arrow keys, A and D, or H and L (vi-style).
+ * The game can be reset by pressing R, paused by pressing P and terminated by pressing Q.
+ * If you die, restart by pressing R. 
+ * Your current score and best score so far are shown at the bottom of the screen.
+ *
+ * If you get the Segment Space error, try to clear the RAM and reload the program, 
+ * or restart the VM emulator and reload it.
+ *
+ * Hit the ball from the opposing side to slow it down. Hitting it towards the side it is travelling will speed it up.
+ * But if you stop the ball moving horizontally completely, it will speed up with the next hit!
+ */
+
+class KeepUpGame {
+   field Paddle paddle; // the square of this game
+   field Ball ball; // the ball of the game
+   field String deathstr; // String created so we can safely dispose later
+   
+   /** Constructs a new Square Game. */
+   constructor KeepUpGame new() {
+      // Creates a 60x10 paddle and positions it at the centre-bottom
+      // of the screen, with a fixed speed of 3 pixels per move.
+      do Screen.clearScreen();
+      let paddle = Paddle.new(270, 230, 60, 10, 3);
+      let ball = Ball.new(299, 200, 4, 1, -1);
+      return this;
+   }
+
+   /** Disposes this game. */
+   method void dispose() {
+      do deathstr.dispose();
+      do paddle.dispose();
+      do ball.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+
+   /** Runs the main game loop - handling user input and collision detection. */ 
+   method int run(int bestscore) {
+      var char key;  // the key currently pressed by the user
+      var boolean exit;
+      var boolean lastMoveLeft;
+
+      // local vars for collisions
+      var int score;
+      var int ballx;
+      var int bally;
+      var int speedy;
+      var int ballsize;
+      var int paddlex;
+      var int paddley;
+      var int paddlelength;
+      var int paddlewidth;
+      var boolean rval; // return value - used to return either score or -1 for quit
+
+      let exit = false;
+      let score = 0;
+      let lastMoveLeft = false;
+      let rval = -1;
+      
+      do KeepUpGame.initScoreText(score, bestscore);
+      do KeepUpGame.splash();
+      do Screen.clearScreen();
+      do paddle.draw();
+      do ball.draw();
+      do KeepUpGame.initScoreText(score, bestscore);
+
+
+      while (~exit) {
+         // waits for a key to be pressed
+         let key = Keyboard.keyPressed();
+         if (key = 81)  { let exit = true; let rval = -1; }     // q key
+         if (key = 82)  {
+              let exit = true;
+              let rval = score;
+                }     // r key
+         if (key = 80)  { do KeepUpGame.pause(); } // p key pauses
+         if ((key = 65) | (key = 72) | (key = 130)) { 
+                          do paddle.moveLeft();
+                          let lastMoveLeft = 1; }   // left arrow
+         if ((key = 132) | (key = 76) | (key = 68)) { 
+                          do paddle.moveRight();
+                          let lastMoveLeft = 0; }   // right arrow
+         do ball.move();
+
+         //Collision detection variables
+         let ballx = ball.get_x();
+         let bally = ball.get_y();
+         let ballsize = ball.get_size();
+         let speedy = ball.get_speedy();
+        
+         let paddlex = paddle.get_x();
+         let paddley = paddle.get_y();
+         let paddlelength = paddle.get_length();
+         let paddlewidth = paddle.get_width();
+
+         // collision
+         if ((ballx > (paddlex-1)) & 
+           (ballx<(paddlex + paddlelength))
+           & (bally>230) & (speedy>0)) {
+           do ball.paddle_rebound(lastMoveLeft);
+           let score = score + 1;
+           do KeepUpGame.updateScore(score);
+         }
+
+        // death
+         if ((bally + ballsize) > 250) {
+           do Output.moveCursor(10, 15);
+           let deathstr = "YOU DIED";
+           do Output.printString(deathstr);
+           do Output.moveCursor(12, 10);
+           let deathstr = "Press R to try again!";
+           do Output.printString(deathstr);
+           let key = 0;
+
+           while(~(key = 82)) {
+             let key = Keyboard.keyPressed();
+           }
+           let rval = score;
+           let exit = true;
+         }
+       do paddle.draw();
+       do Sys.wait(5);
+     } // end main loop 
+     return rval;
+   }
+
+ /** Pauses the game. */
+   function void pause () {
+       // waits for the key to be released
+       var char key;
+       var String str;
+       let key = 80;
+
+       do Output.moveCursor(10, 10);
+       let str = "Game paused.";
+       do Output.printString(str);
+       do Output.moveCursor(11,10);
+       let str = "Press P to unpause.";
+       do Output.printString(str);
+
+       while (~(key = 0)) {
+          let key = Keyboard.keyPressed();
+       }
+       
+       while (~(key = 80)) {
+          let key = Keyboard.keyPressed();
+       }
+
+       while (~(key = 0)) {
+          let key = Keyboard.keyPressed();
+       }
+       do Screen.setColor(0);
+       do Screen.drawRectangle(80,110,230,155);
+       do str.dispose();
+       return;
+   }
+
+   /** Draws Splash screen and waits for user input */
+   function void splash () {
+       // waits for the key to be released
+       var char key;
+       var String str;
+       let key = 0;
+
+       do Output.moveCursor(8, 10);
+       let str = "Welcome to KeepUp.";
+       do Output.printString(str);
+       do Output.moveCursor(9,10);
+       let str = "Use the arrow keys, A and D, or H and L to move.";
+       do Output.printString(str);
+       do Output.moveCursor(10,10);
+       let str = "Press P to pause the game.";
+       do Output.printString(str);
+       do Output.moveCursor(11,10);
+       let str = "Press R to reset the game.";
+       do Output.printString(str);
+       do Output.moveCursor(12,10);
+       let str = "Press Q to quit the game.";
+       do Output.printString(str);
+       do Output.moveCursor(13,10);
+       let str = "Press any key to start!";
+       do Output.printString(str);
+       
+       while ((key = 0) | (key = 82)) {
+          let key = Keyboard.keyPressed();
+       }
+       do str.dispose();
+       return;
+   }
+
+   /** Draw placeholder for scores at the bottom of the screen. */
+   function void initScoreText (int score, int bestscore) {
+      var String str;
+
+      do Output.moveCursor(22,0);
+      let str = "Score: ";
+      do Output.printString(str);
+      do Output.moveCursor(22,8);
+      do Output.printInt(score);
+      do Output.moveCursor(22,32);
+      let str = "Best: ";
+      do Output.printString(str);
+      do Output.moveCursor(22,39);
+      do Output.printInt(bestscore);
+      do str.dispose();
+      return;
+   }
+
+   /** Updates the score at the bottom of the screen. */
+   function void updateScore (int score) {
+     do Screen.setColor(0);
+     do Screen.drawRectangle(64,240,96,251);
+     do Output.moveCursor(22,8);
+     do Output.printInt(score);
+     return;
+   }
+}
+
+
+

@@ -1,0 +1,23 @@
+/** Initalises the game and disposes of it afterwards
+
+   Loops when reset to maintain the best score between games.
+  */
+class Main {
+    function void main() {
+        var KeepUpGame game;
+        var int score;
+        var int bestscore;
+        let score = 0;
+        let bestscore = 0;
+
+        while (score > -1) {
+        let game = KeepUpGame.new();
+        let score = game.run(bestscore);
+        if (score > bestscore) {
+          let bestscore = score;
+        }
+        do game.dispose();
+        }
+        return;
+    }
+}

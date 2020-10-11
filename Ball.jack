@@ -1,0 +1,120 @@
+/** Implements the ball to be hit by the paddle. */
+class Ball {
+
+   field int x, y; // screen location of the ball's top-left corner
+   field int size; // size of this ball, in pixels
+   field int speedx, speedy; // the speed of the ball in pixels
+   field boolean stillmove;
+
+   /** Constructs a new ball with a given location and size. */
+   constructor Ball new(int Ax, int Ay, int Asize, int Aspeedx, int Aspeedy) {
+      let x = Ax;
+      let y = Ay;
+      let size = Asize;
+      let speedx = Aspeedx;
+      let speedy = Aspeedy;
+      let stillmove = 1;
+      do draw();
+      return this;
+   }
+
+   method int get_x () {
+     return x;
+   }
+
+   method int get_y () {
+     return y;
+   }
+
+   method int get_size () {
+     return size;
+   }
+
+   method int get_speedy () {
+     return speedy;
+   }
+   /** Disposes this ball. */
+   method void dispose() {
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   /** Draws the ball on the screen. */
+   method void draw() {
+      do Screen.setColor(true);
+      do Screen.drawRectangle(x, y, x + size, y + size);
+      return;
+   }
+
+   /** Erases the ball from the screen. */
+   method void erase() {
+      do Screen.setColor(false);
+      do Screen.drawRectangle(x, y, x + size, y + size);
+      return;
+   }
+
+  method void move() {
+     do Screen.setColor(false);
+     do Screen.drawRectangle(x, y, x + size, y + size);
+     do erase();
+     if (speedy = 0) {
+       let speedy = -1;
+     }
+     if ((x + speedx + size) > 509) {
+        let speedx = -speedx;
+        let x = (510 - size);
+        let stillmove = 0;
+     }
+     if ((x + speedx) < 2) {
+        let speedx = -speedx;
+        let x = 1;
+        let stillmove = 0;
+     }
+     if ((y+ speedy) < 2) {
+        let speedy = -speedy;
+        let y = 1;
+        let stillmove = 0;
+     }
+     if (stillmove) {
+       let x = x + speedx;
+       let y = y + speedy;
+     }
+     else {
+       let stillmove = 1;
+     }
+     do draw();
+     return;
+  }
+
+  method void paddle_rebound(boolean lastMoveLeft) {
+    let speedy = -speedy;
+    if (speedx = 0){
+      if (lastMoveLeft){
+        let speedx = -2;
+      }
+      else {
+        let speedx = 2;
+      }
+      let speedy = -2;
+      return;
+    }
+    if (lastMoveLeft){
+     if (speedx > 0) {
+       let speedx = -(speedx - 1);
+     }
+     else {
+       let speedx = (speedx - 1);
+     }
+    }
+    else {
+      if (speedx < 0){
+        let speedx = -(speedx + 1);
+      }
+      else {
+        let speedx = (speedx + 1);
+      }
+    }
+    return;
+  }
+}
+
