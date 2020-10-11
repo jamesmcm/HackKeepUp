@@ -15,3 +15,13 @@ or restart the VM emulator and reload it.
 
 Hit the ball from the opposing side to slow it down. Hitting it towards the side it is travelling will speed it up.
 But if you stop the ball moving horizontally completely, it will speed up with the next hit!
+
+## Execution
+
+Load the compiled program in `bin/` in the Nand2Tetris VMEmulator, allow it to use
+the built-in Operating System implementations (as the OS implementation
+is not included in these files) and play it at maximum speed.
+
+## Screenshot
+
+![Screenshot](screenshot.png)

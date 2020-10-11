@@ -1,0 +1,34 @@
+function Main.main 3
+push constant 0
+pop local 1
+push constant 0
+pop local 2
+label WHILE_EXP0
+push local 1
+push constant 1
+neg
+gt
+not
+if-goto WHILE_END0
+call KeepUpGame.new 0
+pop local 0
+push local 0
+push local 2
+call KeepUpGame.run 2
+pop local 1
+push local 1
+push local 2
+gt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 1
+pop local 2
+label IF_FALSE0
+push local 0
+call KeepUpGame.dispose 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
+return
